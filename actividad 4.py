@@ -1,3 +1,66 @@
+
+# ============================================================
+# MODELO DE APRENDIZAJE NO SUPERVISADO
+# Sistema de transporte masivo
+# Algoritmo: K-Means
+# ============================================================
+
+# ============================================================
+# 1. IMPORTAR LAS LIBRERIAS NECESARIAS MARCO
+# ============================================================
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+
+# ============================================================
+# 2. CREAR EL DATASET MARCO
+# ============================================================
+
+
+datos = {
+    "Estacion": [
+        "Terminal",
+        "Centro",
+        "Parque",
+        "Universidad",
+        "Estadio",
+        "Hospital",
+        "Aeropuerto"
+    ],
+
+    "Conexiones": [3, 5, 4, 3, 2, 4, 1],
+
+    "Tiempo_promedio": [12, 8, 10, 9, 14, 7, 18],
+
+    "Pasajeros": [900, 1500, 1100, 1300, 700, 1400, 400],
+
+    "Rutas": [3, 4, 3, 2, 2, 3, 1]
+}
+
+# Convertir los datos en una tabla de pandas
+df = pd.DataFrame(datos)
+
+# Mostrar el dataset original
+print("DATASET DEL TRANSPORTE MASIVO")
+print(df.to_string(index=False))
+
+# ============================================================
+# 3. SELECCIONAR LAS VARIABLES NUMERICAS MARCO
+# ============================================================
+
+# No incluimos el nombre de la estacion porque es texto.
+
+variables = [
+    "Conexiones",
+    "Tiempo_promedio",
+    "Pasajeros",
+    "Rutas"
+]
+
+X = df[variables]
 # ============================================================
 # 4. NORMALIZAR LOS DATOS
 # ============================================================
