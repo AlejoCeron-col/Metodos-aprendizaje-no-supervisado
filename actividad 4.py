@@ -1,5 +1,5 @@
 # ============================================================
-# 4. NORMALIZAR LOS DATOS DANIEL
+# 4. NORMALIZAR LOS DATOS
 # ============================================================
 
 # Esto evita que una variable con valores grandes,
@@ -9,7 +9,7 @@ escalador = StandardScaler()
 X_escalado = escalador.fit_transform(X)
 
 # ============================================================
-# 5. CREAR Y ENTRENAR EL MODELO DE K-MEANS DANIEL
+# 5. CREAR Y ENTRENAR EL MODELO DE K-MEANS 
 # ============================================================
 
 # Se buscan tres grupos de estaciones.
@@ -25,7 +25,7 @@ df["Grupo"] = modelo.fit_predict(X_escalado)
 
 
 # ============================================================
-# 6. ASIGNAR NOMBRES DESCRIPTIVOS A LOS GRUPOS DANIEL
+# 6. ASIGNAR NOMBRES DESCRIPTIVOS A LOS GRUPOS 
 # ============================================================
 
 # Variables que representan la actividad de una estacion.
