@@ -85,3 +85,148 @@ print(
     .mean(numeric_only=True)
     .round(2)
 )
+
+# ============================================================
+# 7. MOSTRAR LOS RESULTADOS DEL AGRUPAMIENTO
+# ============================================================
+
+print("\nESTACIONES AGRUPADAS")
+print(
+    df[["Estacion", "Conexiones",
+        "Tiempo_promedio", "Pasajeros",
+        "Rutas", "Grupo"]].to_string(index=False)
+)
+
+# ============================================================
+# 8. CALCULAR LOS PERFILES PROMEDIO DE CADA GRUPO
+# ============================================================
+
+print("\nCARACTERISTICAS PROMEDIO DE CADA GRUPO")
+print(
+    df.groupby("Grupo")[variables]
+    .mean()
+    .round(2)
+)
+
+# ============================================================
+# 8. CREAR UN GRAFICO DE DISPERSION PARA VISUALIZAR LOS GRUPOS
+# ============================================================
+
+
+# Eje X: cantidad de conexiones.
+# Eje Y: cantidad estimada de pasajeros.
+# El color representa el grupo encontrado.
+
+plt.figure(figsize=(10, 6))
+
+for grupo in sorted(df["Grupo"].unique()):
+    estaciones = df[df["Grupo"] == grupo]
+
+    plt.scatter(
+        estaciones["Conexiones"],
+        estaciones["Pasajeros"],
+        s=100,
+        label=nombres_grupos[grupo]
+    )
+
+    # Escribir el nombre de cada estacion en el grafico
+    for _, fila in estaciones.iterrows():
+        plt.annotate(
+            fila["Estacion"],
+            (fila["Conexiones"], fila["Pasajeros"]),
+            xytext=(5, 5),
+            textcoords="offset points"
+        )
+
+plt.title("Agrupacion de estaciones mediante K-Means")
+plt.xlabel("Cantidad de conexiones")
+plt.ylabel("Pasajeros estimados")
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+
+# Mostrar el grafico
+plt.show()
+
+# ============================================================
+# 9. PRUEBA CON ESTACIONES NUEVAS
+# ============================================================
+
+# Creamos tres estaciones que NO estaban en el dataset
+# utilizado para entrenar el modelo.
+
+datos_nuevos = pd.DataFrame({
+    "Estacion": ["Mercado", "Coliseo", "Zona Rural"],
+    "Conexiones": [5, 2, 1],
+    "Tiempo_promedio": [7, 13, 20],
+    "Pasajeros": [1600, 750, 300],
+    "Rutas": [4, 2, 1]
+})
+
+print("\nPRUEBA CON DATOS NUEVOS")
+print(datos_nuevos.to_string(index=False))
+
+# Seleccionamos las mismas variables del entrenamiento.
+X_nuevo = datos_nuevos[variables]
+
+# Aplicamos el MISMO escalador del entrenamiento.
+# No debemos entrenar otro escalador con estos datos.
+X_nuevo_escalado = escalador.transform(X_nuevo)
+
+# El modelo asigna cada estación al grupo más cercano.
+grupos_nuevos = modelo.predict(X_nuevo_escalado)
+
+# Guardamos las predicciones en la tabla.
+datos_nuevos["Grupo asignado"] = grupos_nuevos
+
+# Convertir el numero del grupo en un nombre descriptivo.
+datos_nuevos["Perfil"] = (
+    datos_nuevos["Grupo asignado"].map(nombres_grupos)
+)
+
+print("\nRESULTADOS CON NOMBRES DESCRIPTIVOS")
+
+print(
+    datos_nuevos[
+        ["Estacion", "Conexiones", "Tiempo_promedio",
+         "Pasajeros", "Rutas", "Perfil"]
+    ].to_string(index=False)
+)
+
+# Mostramos los resultados de la prueba.
+print("\nRESULTADOS DE LAS ESTACIONES NUEVAS")
+
+print(
+    datos_nuevos[
+        ["Estacion", "Conexiones",
+         "Tiempo_promedio", "Pasajeros",
+         "Rutas", "Grupo asignado"]
+    ].to_string(index=False)
+)
+
+# Comprobar que el modelo generó una predicción
+# para cada una de las estaciones nuevas.
+
+if len(grupos_nuevos) == len(datos_nuevos):
+    print("\nPRUEBA SUPERADA:")
+    print("El modelo proceso todas las estaciones nuevas.")
+else:
+    print("\nPRUEBA FALLIDA:")
+    print("No se procesaron todas las estaciones.")
+
+# ============================================================
+# 10. COMPARAR ESTACIONES NUEVAS CON LAS ORIGINALES
+# ============================================================
+
+print("\nCOMPARACION DE ESTACIONES POR GRUPO")
+
+for _, nueva in datos_nuevos.iterrows():
+
+    grupo = nueva["Grupo asignado"]
+
+    # Buscar estaciones originales del mismo grupo.
+    similares = df[df["Grupo"] == grupo]["Estacion"].tolist()
+
+    print(f"\nEstacion nueva: {nueva['Estacion']}")
+    print(f"Grupo asignado: {grupo}")
+    print(f"Estaciones originales del grupo: {similares}")
